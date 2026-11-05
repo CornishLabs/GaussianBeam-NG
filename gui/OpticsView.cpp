@@ -1,6 +1,7 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
    Modified 2026-11-05 by Daniel Ruttley: ported to Qt 5 and Windows (see CHANGES.md)
+   Modified 2026-11-05 by Daniel Ruttley: added wavefront drawing (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -29,6 +30,7 @@
 #include <QtWidgets>
 #endif
 #include <QtDebug>
+#include <QSettings>
 
 #include <cmath>
 
@@ -73,12 +75,23 @@ OpticsScene::OpticsScene(OpticsBench& bench, QObject* parent)
 	m_targetBeamItem->setPos(0., 0.);
 	addItem(m_targetBeamItem);
 
+	m_showWavefronts = QSettings().value("OpticsScene/showWavefronts", true).toBool();
+
 	m_bench.registerNotify(this);
 }
 
 void OpticsScene::showTargetBeam(bool show)
 {
 	m_targetBeamItem->setVisible(show);
+}
+
+void OpticsScene::showWavefronts(bool show)
+{
+	m_showWavefronts = show;
+	QSettings().setValue("OpticsScene/showWavefronts", show);
+	// Ask each beam to repaint itself
+	foreach (BeamItem* beamItem, m_beamItems)
+		beamItem->update();
 }
 
 bool OpticsScene::targetBeamVisible()
@@ -571,6 +584,116 @@ void BeamItem::drawSegment(double start, double stop, double pixel, int nStep, Q
 		polygon.append(QPointF(z, m_beam->radius(z)));
 }
 
+/*
+ * Wavefronts
+ *
+ * A Gaussian beam's wavefronts (surfaces of constant phase) are spherical with
+ * radius of curvature R(z) = (z - zw) [1 + (z0/(z - zw))^2]. To scale, their
+ * curvature is invisible in this view: the sag across the beam is w^2/(2R),
+ * typically well under a micrometre, while one pixel horizontally is a
+ * fraction of a millimetre.
+ *
+ * Instead, each wavefront is drawn as the curve that is perpendicular, on
+ * screen, to the beam's rays y = c w(z). In the real (unstretched) geometry the
+ * wavefronts are exactly perpendicular to these rays, so this is the true
+ * wavefront as it would look if the view's stretching were applied to it as
+ * well: its sag is the real sag multiplied by the square of the view's
+ * horizontal/vertical scale ratio. It is flat at the waist, most curved near
+ * the Rayleigh range, and becomes an arc centred on the waist in the far field.
+ */
+
+/// Trace the wavefront crossing the axis at @p position, from the lower to the upper edge of the beam.
+/// @p horizontalScale and @p verticalScale are the view scales in m/pixel.
+QPolygonF BeamItem::wavefront(double position, double horizontalScale, double verticalScale) const
+{
+	const double h = fabs(horizontalScale);
+	const double v = fabs(verticalScale);
+	const double zw = m_beam->waistPosition();
+	const double z0 = m_beam->rayleigh();
+
+	// Slope of the ray through (z, y), in pixels per pixel. Rays are y = c w(z), so
+	// dy/dz = y w'(z)/w(z) = y (z - zw)/((z - zw)^2 + z0^2) = y/R(z), finite at the waist.
+	struct Local
+	{
+		static double raySlope(double z, double y, double zw, double z0, double h, double v)
+			{ return (h/v)*y*(z - zw)/(sqr(z - zw) + sqr(z0)); }
+	};
+
+	// Walk from the axis towards the upper edge of the beam in steps of one pixel,
+	// always perpendicular (on screen) to the local ray. Midpoint (2nd order) method.
+	QPolygonF upper;
+	double z = position, y = 0.;
+	upper << QPointF(z, y);
+	for (int step = 0; step < 5000; step++)
+	{
+		double m = Local::raySlope(z, y, zw, z0, h, v);
+		double n = sqrt(sqr(m) + 1.);
+		double zMid = z - 0.5*h*m/n;
+		double yMid = y + 0.5*v/n;
+		m = Local::raySlope(zMid, yMid, zw, z0, h, v);
+		n = sqrt(sqr(m) + 1.);
+		double zNext = z - h*m/n;
+		double yNext = y + v/n;
+
+		// Stop at the edge of the beam, interpolating onto it
+		double inside = y - m_beam->radius(z);             // < 0
+		double outside = yNext - m_beam->radius(zNext);
+		if (outside >= 0.)
+		{
+			double t = inside/(inside - outside);
+			upper << QPointF(z + t*(zNext - z), y + t*(yNext - y));
+			break;
+		}
+
+		z = zNext;
+		y = yNext;
+		upper << QPointF(z, y);
+	}
+
+	// The wavefront is symmetric about the axis
+	QPolygonF result;
+	for (int i = upper.size() - 1; i > 0; i--)
+		result << QPointF(upper[i].x(), -upper[i].y());
+	result << upper;
+	return result;
+}
+
+/// Draw wavefronts at regularly spaced positions along the visible part of the beam
+void BeamItem::drawWavefronts(QPainter* painter, const QColor& color, double horizontalScale, double verticalScale) const
+{
+	const double h = fabs(horizontalScale);
+	if ((h <= 0.) || (fabs(verticalScale) <= 0.))
+		return;
+
+	// Only the part of the beam that is on screen
+	QRectF visible = painter->worldTransform().inverted().mapRect(
+		QRectF(0., 0., painter->device()->width(), painter->device()->height()));
+	const double left = qMax(m_leftBound, visible.left());
+	const double right = qMin(m_rightBound, visible.right());
+	if (left >= right)
+		return;
+
+	// About 40 pixels apart, rounded to 1, 2 or 5 x 10^n metres, at multiples of
+	// that spacing so the wavefronts stay in place when scrolling
+	const double target = 40.*h;
+	const double magnitude = pow(10., floor(log10(target)));
+	const double mantissa = target/magnitude;
+	const double spacing = magnitude*(mantissa < 1.5 ? 1. : mantissa < 3.5 ? 2. : mantissa < 7.5 ? 5. : 10.);
+
+	QPen pen(color);
+	pen.setCosmetic(true);
+	painter->save();
+	painter->setPen(pen);
+	painter->setBrush(Qt::NoBrush);
+
+	int count = 0;
+	for (double position = ceil(left/spacing)*spacing; (position < right) && (count < 1000); position += spacing, count++)
+		if ((position > m_leftBound) && (position < m_rightBound))
+			painter->drawPolyline(wavefront(position, horizontalScale, verticalScale));
+
+	painter->restore();
+}
+
 void BeamItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	Q_UNUSED(widget);
@@ -639,6 +762,10 @@ void BeamItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 		painter->drawConvexPolygon(ray);
 	}
 
+	// Wavefronts, drawn on the main beams only (not on the target beam)
+	OpticsScene* opticsScene = dynamic_cast<OpticsScene*>(scene());
+	if (m_style && !m_auxiliary && opticsScene && opticsScene->wavefrontsVisible())
+		drawWavefronts(painter, beamColor.darker(170), horizontalScale, verticalScale);
 
 	// Waist label
 	/// @todo check if in view

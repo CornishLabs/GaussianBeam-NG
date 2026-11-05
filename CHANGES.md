@@ -8,6 +8,9 @@
   - Files: `src/GaussianBeam.h` (new `BeamRelativeWaistPosition` property, added at the end of the list so saved settings keep their meaning), `gui/Names.cpp`, `gui/GaussianBeamModel.cpp`, `gui/GaussianBeamDelegate.cpp`, `gui/OpticsWidgets.cpp`.
   - Because the number of available columns changed, saved table column choices reset to the defaults once.
   - Removed "Relative waist position" from `TODO`.
+- **Wavefronts on the graph:** the beams are drawn with their wavefronts (surfaces of constant phase), spaced at round-number intervals of about 40 pixels. To scale, the wavefront curvature would be invisible (its sag across the beam, w²/2R, is typically below a micrometre), so each wavefront is drawn perpendicular, on screen, to the beam's rays. This is the real wavefront with the view's horizontal/vertical stretch applied to it: flat at the waist, most curved near the Rayleigh range, and an arc centred on the waist in the far field. Wavefronts can be turned off with "Show wavefronts" in the view properties panel (the zoom icon in the corner of the view); the choice is saved.
+  - Files: `gui/OpticsView.h`, `gui/OpticsView.cpp` (`BeamItem::wavefront`, `BeamItem::drawWavefronts`, `OpticsScene::showWavefronts`), `gui/OpticsWidgets.h`, `gui/OpticsWidgets.cpp`, `gui/OpticsViewProperties.ui`.
+  - Removed "Wavefront on graph" from `TODO`.
 
 ### Fixed
 

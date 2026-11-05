@@ -1,5 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
+   Modified 2026-11-05 by Daniel Ruttley: added wavefront drawing (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -46,6 +47,9 @@ public:
 public:
 	void showTargetBeam(bool show = true);
 	bool targetBeamVisible();
+	/// Show or hide the wavefronts drawn on the beams (saved in the settings)
+	void showWavefronts(bool show = true);
+	bool wavefrontsVisible() const { return m_showWavefronts; }
 
 private:
 	void OpticsBenchDataChanged(int startOptics, int endOptics);
@@ -63,6 +67,7 @@ private:
 	QList<BeamItem*> m_beamItems;
 	BeamItem* m_targetBeamItem;
 	QList<QGraphicsEllipseItem*> m_fitItems;
+	bool m_showWavefronts;
 };
 
 class OpticsView : public QGraphicsView
@@ -157,6 +162,8 @@ public:
 
 private:
 	void drawSegment(double start, double stop, double pixel, int nStep, QPolygonF& polygon) const;
+	void drawWavefronts(QPainter* painter, const QColor& color, double horizontalScale, double verticalScale) const;
+	QPolygonF wavefront(double position, double horizontalScale, double verticalScale) const;
 
 private:
 	const Beam* m_beam;

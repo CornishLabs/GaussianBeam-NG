@@ -1,6 +1,7 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
    Modified 2026-11-05 by Daniel Ruttley: ported to Qt 5 and Windows (see CHANGES.md)
+   Modified 2026-11-05 by Daniel Ruttley: added wavefront drawing (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -130,8 +131,11 @@ OpticsViewProperties::OpticsViewProperties(OpticsView* view)
 	: QWidget(view)
 {
 	m_view = view;
+	m_update = false;
 	setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose);
+	if (OpticsScene* scene = dynamic_cast<OpticsScene*>(m_view->scene()))
+		checkBox_Wavefronts->setChecked(scene->wavefrontsVisible());
 	m_update = true;
 }
 
@@ -151,6 +155,14 @@ void OpticsViewProperties::on_doubleSpinBox_Origin_valueChanged(double value)
 {
 	if (m_update)
 		m_view->setOrigin(value*Units::getUnit(UnitPosition).multiplier());
+}
+
+void OpticsViewProperties::on_checkBox_Wavefronts_toggled(bool checked)
+{
+	if (!m_update)
+		return;
+	if (OpticsScene* scene = dynamic_cast<OpticsScene*>(m_view->scene()))
+		scene->showWavefronts(checked);
 }
 
 void OpticsViewProperties::setViewWidth(double width)
