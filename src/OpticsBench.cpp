@@ -1,5 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
+   Modified 2026-11-05 by Daniel Ruttley: fixed display update after editing a downstream waist (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -357,7 +358,8 @@ void OpticsBench::computeBeams(int changedIndex, bool backward)
 
 	m_sensitivity = function.curvature(function.currentPosition())/2.;
 
-	emitChange(changedIndex, nOptics()-1);
+	// When computing backward, all beams before changedIndex (and the input beam) changed too
+	emitChange(backward ? 0 : changedIndex, nOptics()-1);
 }
 
 void OpticsBench::emitChange(int startOptics, int endOptics) const
