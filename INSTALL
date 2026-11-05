@@ -1,0 +1,48 @@
+(Modified 2026-11-05 by Daniel Ruttley: added Windows instructions, see CHANGES.md)
+
+This software requires the following libraries:
+
+	- Qt >= 4.4 (Qt 5 is supported)
+
+To compile this software, type:
+
+	qmake
+	make
+
+To install this software, type:
+
+	make install
+
+
+Windows (10/11)
+---------------
+
+1. Install MSYS2 from https://www.msys2.org (no account needed).
+
+2. Open the "MSYS2 UCRT64" terminal and install the compiler and Qt 5:
+
+	pacman -Syu
+	pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-qt5-base
+
+3. In the same terminal, go to this directory and build:
+
+	qmake-qt5
+	mingw32-make
+
+   (MSYS2 names the Qt 5 qmake "qmake-qt5"; plain "qmake" is Qt 6.)
+
+   The program is built as release/GaussianBeam-NG.exe.
+
+4. To run it outside the MSYS2 terminal (e.g. by double-clicking), copy
+   the required Qt DLLs next to the executable:
+
+	pacman -S mingw-w64-ucrt-x86_64-qt5-tools
+	windeployqt-qt5 release/GaussianBeam-NG.exe
+
+   Alternatively, build a single self-contained .exe (no DLLs needed) with
+   the static Qt package:
+
+	pacman -S mingw-w64-ucrt-x86_64-qt5-static
+	mingw32-make distclean
+	/ucrt64/qt5-static/bin/qmake
+	mingw32-make

@@ -1,0 +1,43 @@
+WISHLIST:
+	Artwork
+	Relative waist position
+	Lens selection
+	Sensitivity graph
+	Lens movement magnification -> multiple views
+	Telescope lens lock
+	Print
+	Better Wavelength to RGB function
+	Forbidden area
+	Diaphragme
+	Relative distances on graph
+	Export graph & tables to text data
+	Optical cavities, eigen mode and stability.
+	Waist relative to selection
+	Wavefront on graph
+	Tune the number of significative digits in editors and delegates
+	grid
+	when moving an optics, display the optics position
+	make unit tests for saving/loading
+	undo framework
+	reimplement paint items in view for optics painting in scene coordinates
+	Thick lens, thermal lens
+	Non linear hyperbolic fit
+	Camera interfaces
+	Set view limits to bench limits button
+	Horizontal and vertical waists
+	TEMmn modes
+
+BUGS:
+	Check that the waist translation by a dielectric slab is right
+	implement ruller scale & vertical labels
+
+CONSTANT VIGILENCE:
+	change all parameters when changing the wavelength
+	Check initial values
+	Check that the save command saves all parameters & optics
+	Translations
+	Pedantic
+	Valgrind
+	API documentation
+	check that .c_str() stl strings are enclosed in a QString::fromUtf8
+	check const functions

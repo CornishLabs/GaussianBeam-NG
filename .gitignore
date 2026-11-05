@@ -1,0 +1,24 @@
+# qmake / make build output
+Makefile
+Makefile.*
+object_script.*
+.qmake.stash
+ui_*.h
+moc_*.cpp
+qrc_*.cpp
+*_plugin_import.cpp
+*_resource.rc
+release/
+debug/
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.qm
+
+# Qt Creator / editors
+*.pro.user
+*.pro.user.*
+.vscode/
