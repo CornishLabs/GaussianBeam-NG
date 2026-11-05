@@ -1,6 +1,7 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
    Modified 2026-11-05 by Daniel Ruttley: fixed display update after editing a downstream waist (see CHANGES.md)
+   Modified 2026-11-05 by Daniel Ruttley: default input beam at 0 mm (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -51,7 +52,7 @@ OpticsBench::OpticsBench()
 	m_opticsPrefix[DielectricSlabType]  = "D";
 
 	m_optics.clear();
-	addOptics(new CreateBeam(180e-6, 10e-3, 1., "w0"), 0);
+	addOptics(new CreateBeam(180e-6, 0., 1., "w0"), 0);
 	m_optics[0]->setAbsoluteLock(true);
 
 	m_wavelength = 461e-9;
@@ -302,7 +303,7 @@ void OpticsBench::opticsPropertyChanged(int /*index*/)
 void OpticsBench::setInputBeam(const Beam& beam)
 {
 	if (m_optics.size() <= 0)
-		addOptics(new CreateBeam(180e-6, 10e-3, 1., "w0"), 0);
+		addOptics(new CreateBeam(180e-6, 0., 1., "w0"), 0);
 
 	CreateBeam* createBeam = dynamic_cast<CreateBeam*>(m_optics[0]);
 	createBeam->setWaist(beam.waist());

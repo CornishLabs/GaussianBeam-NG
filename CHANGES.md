@@ -12,6 +12,10 @@
   - Files: `gui/OpticsView.h`, `gui/OpticsView.cpp` (`BeamItem::wavefront`, `BeamItem::drawWavefronts`, `OpticsScene::showWavefronts`), `gui/OpticsWidgets.h`, `gui/OpticsWidgets.cpp`, `gui/OpticsViewProperties.ui`.
   - Removed "Wavefront on graph" from `TODO`.
 
+### Changed
+
+- **Default input beam position:** a new bench now starts with the input beam waist at 0 mm instead of 10 mm, so the default lenses are at 50 and 100 mm. Saved files are unaffected. (`src/OpticsBench.cpp`)
+
 ### Fixed
 
 - **Stale drawing after editing a downstream waist** (bug present in GaussianBeam 0.4): editing a waist or waist position for an optic after the input beam recalculates all earlier beams, including the input beam, but the view was only told about the edited beam and those after it. Earlier beams kept their old drawing and waist labels. `src/OpticsBench.cpp` now announces changes from the input beam onwards in this case.
