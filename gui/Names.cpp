@@ -1,5 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
+   Modified 2026-11-05 by Daniel Ruttley: added relative waist position (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -46,6 +47,7 @@ void initNames(QApplication* app)
 	Property::fullName.insert(Property::OpticsProperties,       app->translate("Names", "Properties"));
 	Property::fullName.insert(Property::BeamWaist,              app->translate("Names", "Waist"));
 	Property::fullName.insert(Property::BeamWaistPosition,      app->translate("Names", "Waist position"));
+	Property::fullName.insert(Property::BeamRelativeWaistPosition, app->translate("Names", "Relative waist position"));
 	Property::fullName.insert(Property::BeamRayleigh,           app->translate("Names", "Rayleigh range"));
 	Property::fullName.insert(Property::BeamDivergence,         app->translate("Names", "Divergence"));
 	Property::fullName.insert(Property::OpticsSensitivity,      app->translate("Names", "Sensitivity"));
@@ -66,6 +68,7 @@ void initNames(QApplication* app)
 	Property::shortName.insert(Property::OpticsProperties,       app->translate("Names", "Prop."));
 	Property::shortName.insert(Property::BeamWaist,              app->translate("Names", "w₀"));
 	Property::shortName.insert(Property::BeamWaistPosition,      app->translate("Names", "zw"));
+	Property::shortName.insert(Property::BeamRelativeWaistPosition, app->translate("Names", "zw-z"));
 	Property::shortName.insert(Property::BeamRayleigh,           app->translate("Names", "z₀"));
 	Property::shortName.insert(Property::BeamDivergence,         app->translate("Names", "Θ₀"));
 	Property::shortName.insert(Property::OpticsSensitivity,      app->translate("Names", "Sens."));
@@ -86,6 +89,7 @@ void initNames(QApplication* app)
 	Property::unit.insert(Property::OpticsProperties,       UnitLess);
 	Property::unit.insert(Property::BeamWaist,              UnitWaist);
 	Property::unit.insert(Property::BeamWaistPosition,      UnitPosition);
+	Property::unit.insert(Property::BeamRelativeWaistPosition, UnitPosition);
 	Property::unit.insert(Property::BeamRayleigh,           UnitRayleigh);
 	Property::unit.insert(Property::BeamDivergence,         UnitDivergence);
 	Property::unit.insert(Property::OpticsSensitivity,      UnitLess);//app->translate(       "Sensitivity") + "\n(%/" + Units::getUnit(UnitPosition).string(false) + tr("²") + ")";

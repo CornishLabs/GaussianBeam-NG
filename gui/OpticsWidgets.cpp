@@ -345,10 +345,10 @@ TablePropertySelector::TablePropertySelector(QWidget* parent)
 
 	defaultPropertyList << Property::OpticsType << Property::OpticsPosition
 	                    << Property::OpticsRelativePosition << Property::OpticsProperties
-	                    << Property::BeamWaist << Property::BeamWaistPosition << Property::BeamRayleigh
-	                    << Property::BeamDivergence << Property::OpticsSensitivity
+	                    << Property::BeamWaist << Property::BeamWaistPosition << Property::BeamRelativeWaistPosition
+	                    << Property::BeamRayleigh << Property::BeamDivergence << Property::OpticsSensitivity
 	                    << Property::OpticsName << Property::OpticsLock;
-	defaultCheckList << true << true << true << true << true << true << true << true << true << true << true;
+	defaultCheckList << true << true << true << true << true << true << true << true << true << true << true << true;
 
 	readSettings(defaultPropertyList, defaultCheckList);
 }

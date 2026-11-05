@@ -1,6 +1,7 @@
+(Modified 2026-11-05 by Daniel Ruttley: removed items implemented in GaussianBeam-NG, see CHANGES.md)
+
 WISHLIST:
 	Artwork
-	Relative waist position
 	Lens selection
 	Sensitivity graph
 	Lens movement magnification -> multiple views

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Relative waist position column:** shows the distance from each optic to the waist of the beam leaving it. This is the waist position minus the optic's end position (its position plus its width, for thick optics). Negative values mean a virtual waist before the optic. The column is editable, like the "Waist position" column. Short name `zw-z`; it can be hidden or reordered via the table's column settings.
+  - Files: `src/GaussianBeam.h` (new `BeamRelativeWaistPosition` property, added at the end of the list so saved settings keep their meaning), `gui/Names.cpp`, `gui/GaussianBeamModel.cpp`, `gui/GaussianBeamDelegate.cpp`, `gui/OpticsWidgets.cpp`.
+  - Because the number of available columns changed, saved table column choices reset to the defaults once.
+  - Removed "Relative waist position" from `TODO`.
+
+### Fixed
+
+- **Stale drawing after editing a downstream waist** (bug present in GaussianBeam 0.4): editing a waist or waist position for an optic after the input beam recalculates all earlier beams, including the input beam, but the view was only told about the edited beam and those after it. Earlier beams kept their old drawing and waist labels. `src/OpticsBench.cpp` now announces changes from the input beam onwards in this case.
+
 ## GaussianBeam-NG 0.4.1 (2026-11-05)
 
 GaussianBeam-NG 0.4.1 is a modified version of GaussianBeam 0.4 (2008) by

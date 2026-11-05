@@ -89,6 +89,7 @@ QWidget *GaussianBeamDelegate::createEditor(QWidget* parent,
 	case Property::OpticsPosition:
 	case Property::OpticsRelativePosition:
 	case Property::BeamWaistPosition:
+	case Property::BeamRelativeWaistPosition:
 	{
 		QDoubleSpinBox* editor = new QDoubleSpinBox(parent);
 		editor->setAccelerated(true);
@@ -162,6 +163,7 @@ void GaussianBeamDelegate::setEditorData(QWidget* editor, const QModelIndex& ind
 	case Property::OpticsRelativePosition:
 	case Property::BeamWaist:
 	case Property::BeamWaistPosition:
+	case Property::BeamRelativeWaistPosition:
 	case Property::BeamRayleigh:
 	case Property::BeamDivergence:
 	{

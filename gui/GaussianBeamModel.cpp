@@ -134,6 +134,9 @@ QVariant GaussianBeamModel::data(const QModelIndex& index, int role) const
 		data << m_bench.beam(row)->waist()*Units::getUnit(UnitWaist).divider();
 	else if (column == Property::BeamWaistPosition)
 		data << m_bench.beam(row)->waistPosition()*Units::getUnit(UnitPosition).divider();
+	else if (column == Property::BeamRelativeWaistPosition)
+		// Distance from the output face of the optics to the waist of the beam leaving it
+		data << (m_bench.beam(row)->waistPosition() - m_bench.optics(row)->endPosition())*Units::getUnit(UnitPosition).divider();
 	else if (column == Property::BeamRayleigh)
 		data << m_bench.beam(row)->rayleigh()*Units::getUnit(UnitRayleigh).divider();
 	else if (column == Property::BeamDivergence)
@@ -250,6 +253,12 @@ bool GaussianBeamModel::setData(const QModelIndex& index, const QVariant& value,
 		beam.setWaistPosition(value.toDouble()*Units::getUnit(UnitPosition).multiplier());
 		m_bench.setBeam(beam, row);
 	}
+	else if (column == Property::BeamRelativeWaistPosition)
+	{
+		Beam beam = *m_bench.beam(row);
+		beam.setWaistPosition(value.toDouble()*Units::getUnit(UnitPosition).multiplier() + m_bench.optics(row)->endPosition());
+		m_bench.setBeam(beam, row);
+	}
 	else if (column == Property::BeamRayleigh)
 	{
 		Beam beam = *m_bench.beam(row);
@@ -299,6 +308,7 @@ Qt::ItemFlags GaussianBeamModel::flags(const QModelIndex& index) const
 		(column == Property::OpticsLock) ||
 		(column == Property::BeamWaist) ||
 		(column == Property::BeamWaistPosition) ||
+		(column == Property::BeamRelativeWaistPosition) ||
 		(column == Property::BeamRayleigh) ||
 		(column == Property::BeamDivergence) ||
 		(column == Property::OpticsProperties)
