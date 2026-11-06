@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## GaussianBeam-NG 0.5.0
+
+New features: a relative waist position column, wavefronts on the graph, a dark mode and new icons. The `.xml` file format is unchanged, so files can be exchanged with GaussianBeam-NG 0.4.1 and GaussianBeam 0.4.
 
 ### Added
 

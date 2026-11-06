@@ -11,7 +11,7 @@ TEMPLATE = app
 # Program name and version: used for the .exe name, the window title and the
 # Windows file properties. Change them here only.
 TARGET = GaussianBeam-NG
-VERSION = 0.4.1
+VERSION = 0.5.0
 DEFINES += APP_NAME=\\\"$$TARGET\\\" APP_VERSION=\\\"$$VERSION\\\"
 QMAKE_TARGET_PRODUCT = GaussianBeam-NG
 QMAKE_TARGET_DESCRIPTION = "GaussianBeam-NG - Gaussian beam optics design"
