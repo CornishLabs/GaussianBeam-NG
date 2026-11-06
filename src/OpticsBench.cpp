@@ -1,7 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026-11-05 by Daniel Ruttley: fixed display update after editing a downstream waist (see CHANGES.md)
-   Modified 2026-11-05 by Daniel Ruttley: default input beam at 0 mm (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: fixed display update after editing a downstream waist; default input beam at 0 mm (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public

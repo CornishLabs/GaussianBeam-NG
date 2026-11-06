@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026-11-05 by Daniel Ruttley: added wavefront drawing (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: added wavefront drawing (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public

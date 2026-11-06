@@ -20,11 +20,11 @@
 
 - **Stale drawing after editing a downstream waist** (bug present in GaussianBeam 0.4): editing a waist or waist position for an optic after the input beam recalculates all earlier beams, including the input beam, but the view was only told about the edited beam and those after it. Earlier beams kept their old drawing and waist labels. `src/OpticsBench.cpp` now announces changes from the input beam onwards in this case.
 
-## GaussianBeam-NG 0.4.1 (2026-11-05)
+## GaussianBeam-NG 0.4.1
 
 GaussianBeam-NG 0.4.1 is a modified version of GaussianBeam 0.4 (2008) by
-Jérôme Lodewyck. Changes made 2026-11-05 by Daniel Ruttley to build and run
-with Qt 5 on Windows 10/11. The changes are guarded by `QT_VERSION` checks, so
+Jérôme Lodewyck. Changes made by Daniel Ruttley to build and run with
+Qt 5 on Windows 10/11. The changes are guarded by `QT_VERSION` checks, so
 the code should still build with Qt 4, although this has not been tested.
 
 ### Renamed to GaussianBeam-NG
