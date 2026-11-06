@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode toggle and new icons (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -59,6 +59,7 @@ protected slots:
 	void on_action_AddGenericABCD_triggered()     { insertOptics(GenericABCDType);     }
 	void on_action_AddDielectricSlab_triggered()  { insertOptics(DielectricSlabType);  }
 	void on_WavelengthSpinBox_valueChanged(double wavelength);
+	void updateIcons();
 
 protected:
 	virtual void closeEvent(QCloseEvent* event);
@@ -95,6 +96,7 @@ private:
 
 private:
 	QToolBar* m_fileToolBar;
+	QAction* m_themeAction;
 
 	OpticsBench m_globalBench;
 	QDoubleSpinBox* wavelengthSpinBox;

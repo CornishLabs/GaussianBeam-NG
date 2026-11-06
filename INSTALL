@@ -1,8 +1,8 @@
-(Modified 2026 by Daniel Ruttley: added Windows instructions, see CHANGES.md)
+(Modified 2026 by Daniel Ruttley: added Windows instructions; Qt SVG package, see CHANGES.md)
 
 This software requires the following libraries:
 
-	- Qt >= 4.4 (Qt 5 is supported)
+	- Qt >= 4.4 (Qt 5 is supported), including the Qt SVG module
 
 To compile this software, type:
 
@@ -22,7 +22,7 @@ Windows (10/11)
 2. Open the "MSYS2 UCRT64" terminal and install the compiler and Qt 5:
 
 	pacman -Syu
-	pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-qt5-base
+	pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-qt5-base mingw-w64-ucrt-x86_64-qt5-svg
 
 3. In the same terminal, go to this directory and build:
 

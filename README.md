@@ -2,6 +2,8 @@
 
 GaussianBeam-NG is a program for designing optical systems for Gaussian laser beams. You place optics (lenses, mirrors, interfaces, dielectric slabs and generic ABCD matrices) along an optical axis. It then calculates and draws the beam's waist, waist position, Rayleigh range and divergence after each optic. You can drag optics in the view to see how the beam changes.
 
+It has a light and a dark mode. Switch between them with the moon/sun button in the top-right corner of the window. The first time it runs, it follows the Windows light/dark app setting.
+
 GaussianBeam-NG is a continuation of **GaussianBeam 0.4** (2008), originally written by **Jérôme Lodewyck** for Qt 4. The original no longer builds with current tools. GaussianBeam-NG builds with Qt 5 and runs on Windows 10 and 11. See [CHANGES.md](CHANGES.md) for exactly what was changed and why.
 
 The original project is at <http://gaussianbeam.sourceforge.net>. GaussianBeam-NG is not affiliated with it.
@@ -10,14 +12,14 @@ The original project is at <http://gaussianbeam.sourceforge.net>. GaussianBeam-N
 
 A ready-to-run Windows executable is available on the [Releases](../../releases) page. It is a single `.exe` with Qt built in, so there is nothing to install. Download it and double-click to run.
 
-GaussianBeam-NG opens and saves the same `.xml` files as the original GaussianBeam. It saves its window size and last-used wavelength in the Windows registry, under `HKEY_CURRENT_USER\Software\GaussianBeam-NG`.
+GaussianBeam-NG opens and saves the same `.xml` files as the original GaussianBeam. It saves its window size, last-used wavelength and light/dark mode in the Windows registry, under `HKEY_CURRENT_USER\Software\GaussianBeam-NG`.
 
 ## Building from source
 
 See [INSTALL](INSTALL). In short, on Windows, using [MSYS2](https://www.msys2.org), open the **UCRT64** terminal and run:
 
 ```
-pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-qt5-base
+pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-qt5-base mingw-w64-ucrt-x86_64-qt5-svg
 qmake-qt5
 mingw32-make
 ```
@@ -40,5 +42,5 @@ GaussianBeam-NG is free software, distributed under the GNU General Public Licen
 
 - Original GaussianBeam code © 2007–2008 Jérôme Lodewyck.
 - GaussianBeam-NG changes © 2026 Daniel Ruttley, under the same licence.
-- The toolbar icons come from KDE's Oxygen icon theme.
+- The icons were drawn for GaussianBeam-NG and are under the same licence. (Earlier versions used icons from KDE's Oxygen icon theme.)
 - The Windows release executable is statically linked against Qt 5, which is used under the terms of the GNU GPL.

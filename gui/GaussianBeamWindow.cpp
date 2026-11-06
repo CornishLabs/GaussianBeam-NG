@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode toggle and new icons (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,10 +21,12 @@
 #include "gui/OpticsView.h"
 #include "gui/OpticsWidgets.h"
 #include "gui/Unit.h"
+#include "gui/Theme.h"
 
 #include <QDebug>
 #include <QSplitter>
 #include <QToolBar>
+#include <QToolButton>
 #include <QFile>
 #include <QFileDialog>
 #include <QMenu>
@@ -51,7 +53,8 @@ GaussianBeamWindow::GaussianBeamWindow(const QString& fileName)
 	// Table
 	m_tableConfigWidget = new TablePropertySelector(this);
 	m_tableConfigWidget->setWindowFlags(Qt::Window);
-	m_tableCornerWidget = new CornerWidget(Qt::transparent, ":/images/preferences-system.png", m_tableConfigWidget, this);
+	m_tableCornerWidget = new CornerWidget("settings", m_tableConfigWidget, this);
+	m_tableCornerWidget->setToolTip(tr("Configure table columns"));
 	m_model = new GaussianBeamModel(m_bench, m_tableConfigWidget, this);
 	m_table = new QTableView(this);
 	m_table->setModel(m_model);
@@ -107,6 +110,19 @@ GaussianBeamWindow::GaussianBeamWindow(const QString& fileName)
 	m_fileToolBar->addAction(action_RemoveOptics);
 	m_fileToolBar->addSeparator();
 	m_fileToolBar->addWidget(wavelengthWidget);
+	// Light/dark mode toggle, pushed to the right-hand end of the toolbar.
+	// The toolbar cannot be moved, so the toggle stays in the top-right corner.
+	m_fileToolBar->setMovable(false);
+	QWidget* toolBarSpacer = new QWidget(m_fileToolBar);
+	toolBarSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	m_fileToolBar->addWidget(toolBarSpacer);
+	m_themeAction = new QAction(this);
+	m_fileToolBar->addAction(m_themeAction);
+	if (QToolButton* themeButton = qobject_cast<QToolButton*>(m_fileToolBar->widgetForAction(m_themeAction)))
+		themeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	connect(m_themeAction, SIGNAL(triggered()), Theme::instance(), SLOT(toggle()));
+	connect(Theme::instance(), SIGNAL(changed()), this, SLOT(updateIcons()));
+	updateIcons();
 
 	StatusWidget* statusWidget = new StatusWidget(statusBar());
 	statusBar()->addWidget(statusWidget, 1);
@@ -196,6 +212,23 @@ void GaussianBeamWindow::on_action_RemoveOptics_triggered()
 void GaussianBeamWindow::on_WavelengthSpinBox_valueChanged(double wavelength)
 {
 	m_bench.setWavelength(wavelength*Units::getUnit(UnitWavelength).multiplier());
+}
+
+/// Set the icons in the colours of the current theme, and the light/dark toggle
+void GaussianBeamWindow::updateIcons()
+{
+	action_Open->setIcon(Theme::icon("open"));
+	action_Save->setIcon(Theme::icon("save"));
+	action_SaveAs->setIcon(Theme::icon("save-as"));
+	action_Print->setIcon(Theme::icon("print"));
+	action_AddOptics->setIcon(Theme::icon("add"));
+	action_RemoveOptics->setIcon(Theme::icon("remove"));
+
+	// Shows the mode that clicking switches to
+	const bool dark = Theme::instance()->isDark();
+	m_themeAction->setIcon(Theme::icon(dark ? "sun" : "moon"));
+	m_themeAction->setText(dark ? tr("Light mode") : tr("Dark mode"));
+	m_themeAction->setToolTip(dark ? tr("Switch to light mode") : tr("Switch to dark mode"));
 }
 
 void GaussianBeamWindow::OpticsBenchWavelengthChanged()

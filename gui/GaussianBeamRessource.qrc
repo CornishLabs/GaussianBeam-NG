@@ -1,13 +1,15 @@
+<!-- Modified 2026 by Daniel Ruttley: replaced the PNG icons with SVG icons (see CHANGES.md) -->
 <RCC>
     <qresource prefix="/" >
-        <file>images/document-new.png</file>
-        <file>images/document-open.png</file>
-        <file>images/document-print.png</file>
-        <file>images/document-save-as.png</file>
-        <file>images/document-save.png</file>
-        <file>images/edit-add.png</file>
-        <file>images/edit-delete.png</file>
-        <file>images/zoom-best-fit.png</file>
-        <file>images/preferences-system.png</file>
+        <file>icons/open.svg</file>
+        <file>icons/save.svg</file>
+        <file>icons/save-as.svg</file>
+        <file>icons/print.svg</file>
+        <file>icons/add.svg</file>
+        <file>icons/remove.svg</file>
+        <file>icons/settings.svg</file>
+        <file>icons/zoom-fit.svg</file>
+        <file>icons/sun.svg</file>
+        <file>icons/moon.svg</file>
     </qresource>
 </RCC>

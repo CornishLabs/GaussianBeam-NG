@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: added wavefront drawing (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: added wavefront drawing; dark mode and new icons (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -45,6 +45,7 @@ public:
 
 public:
 	double rullerScale() const;
+	virtual QSize sizeHint() const;
 
 protected:
 	virtual void paintEvent(QPaintEvent* event);
@@ -92,15 +93,17 @@ private:
 class CornerWidget : public QWidget
 {
 public:
-	CornerWidget(QColor backgroundColor, const char*  pixmapName, QWidget* widget, QWidget* parent = 0);
+	/// @p iconName is an icon from Theme::icon(). With @p rulerBackground, the background matches the rulers.
+	CornerWidget(const QString& iconName, QWidget* widget, QWidget* parent = 0, bool rulerBackground = false);
+	virtual QSize sizeHint() const;
 
 protected:
 	virtual void paintEvent(QPaintEvent* event);
 	virtual void mousePressEvent(QMouseEvent* event);
 
 private:
-	QColor m_backgroundColor;
-	QPixmap m_pixmap;
+	QString m_iconName;
+	bool m_rulerBackground;
 	QWidget* m_widget;
 };
 
@@ -138,6 +141,7 @@ private:
 private slots:
 	void checkBoxModified(int state);
 	void itemModified(QListWidgetItem* item);
+	void updateIcon();
 };
 
 /**

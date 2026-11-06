@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; added wavefront drawing (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; added wavefront drawing; dark mode and new icons (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,6 +21,7 @@
 #include "gui/OpticsWidgets.h"
 #include "gui/GaussianBeamModel.h"
 #include "gui/Unit.h"
+#include "gui/Theme.h"
 #include "src/GaussianBeam.h"
 #include "src/Utils.h"
 
@@ -228,7 +229,8 @@ OpticsView::OpticsView(QGraphicsScene* scene)
 	: QGraphicsView(scene)
 {
 	setRenderHint(QPainter::Antialiasing);
-	setBackgroundBrush(Qt::white);
+	setBackgroundBrush(Theme::viewBackground());
+	connect(Theme::instance(), SIGNAL(changed()), this, SLOT(themeChanged()));
 	m_horizontalRange = 0.;
 	m_verticalRange = 0.;
 	m_statusWidget = 0;
@@ -243,8 +245,8 @@ OpticsView::OpticsView(QGraphicsScene* scene)
 	m_opticsViewProperties = new OpticsViewProperties(this);
 	m_opticsViewProperties->hide();
 
-	CornerWidget* cornerWidget = new CornerWidget(QColor(245, 245, 200),
-	              ":/images/zoom-best-fit.png", m_opticsViewProperties, this);
+	CornerWidget* cornerWidget = new CornerWidget("zoom-fit", m_opticsViewProperties, this, true);
+	cornerWidget->setToolTip(tr("View properties"));
 	setCornerWidget(cornerWidget);
 
 	setResizeAnchor(QGraphicsView::AnchorViewCenter);
@@ -281,6 +283,13 @@ void OpticsView::showProperties(bool show)
 bool OpticsView::propertiesVisible()
 {
 	return m_opticsViewProperties->isVisible();
+}
+
+/// Switch the background, and repaint the optics and labels, in the new light/dark colours
+void OpticsView::themeChanged()
+{
+	setBackgroundBrush(Theme::viewBackground());
+	viewport()->update();
 }
 
 void OpticsView::scrollUpdated(int value)
@@ -441,15 +450,15 @@ void OpticsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	Q_UNUSED(option);
 	Q_UNUSED(widget);
 
-	QColor opticsColor = QColor(153, 209, 247, 150);
-	QBrush opticsBrush(opticsColor);
+	const QColor foreground = Theme::viewForeground();
+	QBrush opticsBrush(Theme::opticsFill());
 	painter->setBrush(opticsBrush);
 	// Cosmetic pens are always 1 pixel wide. Since Qt 5, pens are not cosmetic by
 	// default and would be 1 scene unit (1 m) wide, covering the whole view.
-	QPen outlinePen(Qt::black);
+	QPen outlinePen(foreground);
 	outlinePen.setCosmetic(true);
 	painter->setPen(outlinePen);
-	QPen textPen(Qt::black);
+	QPen textPen(foreground);
 	textPen.setCosmetic(true);
 
 	QPainterPath path;
@@ -499,7 +508,7 @@ void OpticsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	else if (m_optics->type() == FlatMirrorType)
 	{
 		painter->drawRect(rect);
-		QBrush ABCDBrush(Qt::black, Qt::BDiagPattern);
+		QBrush ABCDBrush(foreground, Qt::BDiagPattern);
 		painter->setBrush(ABCDBrush);
 		painter->drawRect(rect);
 
@@ -507,14 +516,13 @@ void OpticsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	else if (m_optics->type() == CurvedMirrorType)
 	{
 		painter->drawRect(rect);
-		QBrush ABCDBrush(Qt::black, Qt::BDiagPattern);
+		QBrush ABCDBrush(foreground, Qt::BDiagPattern);
 		painter->setBrush(ABCDBrush);
 		painter->drawRect(rect);
 	}
 	else if (m_optics->type() == GenericABCDType)
 	{
-		QColor color = QColor(193, 193, 193, 150);
-		painter->setBrush(QBrush(color));
+		painter->setBrush(QBrush(Theme::abcdFill()));
 		painter->drawRect(rect);
 	}
 /*
@@ -700,14 +708,26 @@ void BeamItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 	QColor beamColor = wavelengthColor(m_beam->wavelength());
 	beamColor.setAlpha(200);
 
-	QPen beamPen(beamColor);
+	// The beam is slightly transparent, so on the dark background it would look
+	// darker. In dark mode, draw it opaque in the colour it has on the light
+	// background (blended with white), so beams look the same in both modes.
+	QColor drawColor = beamColor;
+	if (Theme::instance()->isDark())
+	{
+		const double a = beamColor.alphaF();
+		drawColor = QColor::fromRgbF(a*beamColor.redF()   + (1. - a),
+		                             a*beamColor.greenF() + (1. - a),
+		                             a*beamColor.blueF()  + (1. - a));
+	}
+
+	QPen beamPen(drawColor);
 	beamPen.setCosmetic(true); // 1 pixel wide regardless of zoom (see OpticsItem::paint)
 	painter->setPen(beamPen);
 
-	QBrush beamBrush(beamColor, m_style ? Qt::SolidPattern : Qt::NoBrush);
+	QBrush beamBrush(drawColor, m_style ? Qt::SolidPattern : Qt::NoBrush);
 	painter->setBrush(beamBrush);
 
-	QPen textPen(Qt::black);
+	QPen textPen(Theme::viewForeground());
 	textPen.setCosmetic(true);
 
 	const double waist = m_beam->waist();

@@ -1,5 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
+   Modified 2026 by Daniel Ruttley: icons follow the light/dark theme (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,6 +21,7 @@
 #include "gui/GaussianBeamWindow.h"
 #include "gui/OpticsView.h"
 #include "gui/Unit.h"
+#include "gui/Theme.h"
 #ifdef GBPLOT
 	#include "gui/GaussianBeamPlot.h"
 #endif
@@ -70,6 +72,10 @@ GaussianBeamWidget::GaussianBeamWidget(OpticsBench& bench, OpticsScene* opticsSc
 	fitTable->setSelectionModel(fitSelectionModel);
 	fitTable->setColumnWidth(0, 82);
 	fitTable->setColumnWidth(1, 82);
+
+	// Icons, in the colours of the current theme
+	updateIcons();
+	connect(Theme::instance(), SIGNAL(changed()), this, SLOT(updateIcons()));
 
 	// Connect slots
 	connect(fitModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
@@ -498,4 +504,12 @@ void GaussianBeamWidget::OpticsBenchFitDataChanged(int index)
 		return;
 
 	updateFitInformation(index);
+}
+
+void GaussianBeamWidget::updateIcons()
+{
+	pushButton_AddFit->setIcon(Theme::icon("add"));
+	pushButton_RemoveFit->setIcon(Theme::icon("remove"));
+	pushButton_FitAddRow->setIcon(Theme::icon("add"));
+	pushButton_FitRemoveRow->setIcon(Theme::icon("remove"));
 }

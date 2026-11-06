@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,6 +20,7 @@
 #include "gui/GaussianBeamWidget.h"
 #include "gui/GaussianBeamWindow.h"
 #include "gui/Names.h"
+#include "gui/Theme.h"
 
 #include <QApplication>
 #include <QTextCodec>
@@ -47,6 +48,9 @@ int main(int argc, char *argv[])
 	app.installTranslator(&translator);
 
 	initNames(&app);
+
+	// Style, palette (light or dark) and icons. Needs the application name for its settings.
+	Theme::instance()->apply();
 
 	///@todo parse other arguments ?
 	QString file;

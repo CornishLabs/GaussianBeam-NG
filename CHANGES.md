@@ -11,9 +11,20 @@
 - **Wavefronts on the graph:** the beams are drawn with their wavefronts (surfaces of constant phase), spaced at round-number intervals of about 40 pixels. To scale, the wavefront curvature would be invisible (its sag across the beam, w²/2R, is typically below a micrometre), so each wavefront is drawn perpendicular, on screen, to the beam's rays. This is the real wavefront with the view's horizontal/vertical stretch applied to it: flat at the waist, most curved near the Rayleigh range, and an arc centred on the waist in the far field. Wavefronts can be turned off with "Show wavefronts" in the view properties panel (the zoom icon in the corner of the view); the choice is saved.
   - Files: `gui/OpticsView.h`, `gui/OpticsView.cpp` (`BeamItem::wavefront`, `BeamItem::drawWavefronts`, `OpticsScene::showWavefronts`), `gui/OpticsWidgets.h`, `gui/OpticsWidgets.cpp`, `gui/OpticsViewProperties.ui`.
   - Removed "Wavefront on graph" from `TODO`.
+- **Dark mode**: a moon/sun button at the right-hand end of the toolbar switches between light and dark mode. The choice is saved (registry value `Theme\dark`). On first run, the app follows the Windows "app mode" setting.
+  - Everything switches: widgets, table, optics view background, rulers, optics outlines, waist labels, and the window title bars. On Windows 10 20H1 and later, title bars use `DwmSetWindowAttribute`.
+  - **The laser beams look the same in both modes.** Beams are drawn slightly transparent, so on a dark background they would look darker. In dark mode they are drawn opaque, in the colour they have on the light background. Wavefront lines are unchanged.
+  - Files: `gui/Theme.h`, `gui/Theme.cpp` (new: palettes, view colours, icons, title bars), `gui/main.cpp`, `gui/GaussianBeamWindow.h`, `gui/GaussianBeamWindow.cpp` (toggle button; the toolbar can no longer be moved, so the button stays top-right), `gui/OpticsView.h`, `gui/OpticsView.cpp`, `gui/OpticsWidgets.h`, `gui/OpticsWidgets.cpp`.
 
 ### Changed
 
+- **New icons**: the KDE Oxygen PNG icons are replaced by a consistent set of outline SVG icons drawn for GaussianBeam-NG (`gui/icons/`). They are recoloured to match light or dark mode.
+  - Icons are now set in code (`Theme::icon`), not in the `.ui` files.
+  - The table and status-bar configuration icons are now "sliders". The view-properties icon is now a frame.
+  - The corner icons show a tooltip and a hand cursor.
+  - **New build dependency:** the Qt SVG module (`QT += svg`). For the shared MSYS2 build, install `mingw-w64-ucrt-x86_64-qt5-svg`. The static Qt package already includes it. On Windows the app also links `dwmapi`.
+  - Files: `gui/icons/*.svg` (new), `gui/images/` (removed), `gui/GaussianBeamRessource.qrc`, `gui/GaussianBeamWindow.ui`, `gui/GaussianBeamWidget.ui`, `gui/GaussianBeamWidget.h`, `gui/GaussianBeamWidget.cpp`, `GaussianBeam.pro`, `INSTALL`, `README.md`.
+- **Fusion style**: the app uses Qt's Fusion style in both modes, because the native Windows style cannot be made dark. This gives the light mode a flatter look too. The rulers and view corner are now neutral grey instead of cream. The rulers are at least as tall as their labels, whatever the style. (`gui/Theme.cpp`, `gui/OpticsWidgets.cpp`)
 - **Default input beam position:** a new bench now starts with the input beam waist at 0 mm instead of 10 mm, so the default lenses are at 50 and 100 mm. Saved files are unaffected. (`src/OpticsBench.cpp`)
 
 ### Fixed

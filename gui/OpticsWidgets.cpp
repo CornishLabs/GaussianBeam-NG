@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; added wavefront drawing (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; added wavefront drawing; dark mode and new icons (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,6 +21,7 @@
 #include "gui/OpticsWidgets.h"
 #include "gui/OpticsView.h"
 #include "gui/Unit.h"
+#include "gui/Theme.h"
 
 #include <QWheelEvent>
 #include <QListWidget>
@@ -51,6 +52,18 @@ double RullerSlider::rullerScale() const
 		scale /= m_view->scene()->height();
 
 	return scale;
+}
+
+/// Make sure the graduation labels fit, whatever the style's scroll bar width
+QSize RullerSlider::sizeHint() const
+{
+	QSize size = QScrollBar::sizeHint();
+	const int extent = qMax(17, fontMetrics().height() + 4);
+	if (orientation() == Qt::Horizontal)
+		size.setHeight(qMax(size.height(), extent));
+	else
+		size.setWidth(qMax(size.width(), extent));
+	return size;
 }
 
 void RullerSlider::mousePressEvent(QMouseEvent* event)
@@ -87,11 +100,11 @@ void RullerSlider::paintEvent(QPaintEvent* event)
 	Q_UNUSED(event);
 
 	QPainter painter(this);
-	QColor backgroundColor(245, 245, 200);
+	QColor backgroundColor = Theme::rulerBackground();
 	QBrush backgroundBrush(backgroundColor);
 	QPen backgroundPen(backgroundColor);
-	QPen mainTickPen(Qt::black);
-	QPen secondTickPen(Qt::lightGray);
+	QPen mainTickPen(Theme::rulerMajorTick());
+	QPen secondTickPen(Theme::rulerMinorTick());
 
 	double scale = rullerScale();
 	double spacing = (orientation() == Qt::Horizontal ? 0.01 : 0.00005);
@@ -188,13 +201,21 @@ void OpticsViewProperties::setViewOrigin(double origin)
 /////////////////////////////////////////////////
 // CornerWidget
 
-CornerWidget::CornerWidget(QColor backgroundColor, const char* pixmapName, QWidget* widget, QWidget* parent)
+CornerWidget::CornerWidget(const QString& iconName, QWidget* widget, QWidget* parent, bool rulerBackground)
 	: QWidget(parent)
-	, m_backgroundColor(backgroundColor)
+	, m_iconName(iconName)
+	, m_rulerBackground(rulerBackground)
 	, m_widget(widget)
 {
-	m_pixmap = QPixmap(pixmapName);
-	setFixedSize(m_pixmap.rect().size());
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	setCursor(Qt::PointingHandCursor);
+	// Repaint with the new icon colour when switching between light and dark mode
+	connect(Theme::instance(), SIGNAL(changed()), this, SLOT(update()));
+}
+
+QSize CornerWidget::sizeHint() const
+{
+	return QSize(16, 16);
 }
 
 void CornerWidget::paintEvent(QPaintEvent* event)
@@ -202,12 +223,14 @@ void CornerWidget::paintEvent(QPaintEvent* event)
 	Q_UNUSED(event);
 
 	QPainter painter(this);
-	QBrush backgroundBrush(m_backgroundColor);
-	QPen backgroundPen(m_backgroundColor);
-	painter.setBrush(backgroundBrush);
-	painter.setPen(backgroundPen);
-	painter.drawRect(rect());
-	painter.drawPixmap(m_pixmap.rect(), m_pixmap, m_pixmap.rect());
+	if (m_rulerBackground)
+		painter.fillRect(rect(), Theme::rulerBackground());
+
+	// The icon, centred, at most 16 pixels
+	const int side = qMin(16, qMin(width(), height()));
+	QRect iconRect(0, 0, side, side);
+	iconRect.moveCenter(rect().center());
+	Theme::icon(m_iconName).paint(&painter, iconRect);
 }
 
 void CornerWidget::mousePressEvent(QMouseEvent* event)
@@ -237,7 +260,13 @@ PropertySelector::PropertySelector(QWidget* parent)
 	connect(m_propertyListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(checkBoxModified(int)));
 	connect(m_propertyListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemModified(QListWidgetItem*)));
 
-	setWindowIcon(QIcon(":/images/preferences-system.png"));
+	updateIcon();
+	connect(Theme::instance(), SIGNAL(changed()), this, SLOT(updateIcon()));
+}
+
+void PropertySelector::updateIcon()
+{
+	setWindowIcon(Theme::icon("settings"));
 }
 
 PropertySelector::~PropertySelector()
@@ -373,8 +402,8 @@ StatusWidget::StatusWidget(QStatusBar* statusBar)
 {
 	m_configWidget = new StatusPropertySelector(this);
 	m_configWidget->setWindowFlags(Qt::Window);
-	CornerWidget* corner = new CornerWidget(Qt::transparent, ":/images/preferences-system.png",
-	                       m_configWidget, this);
+	CornerWidget* corner = new CornerWidget("settings", m_configWidget, this);
+	corner->setToolTip(tr("Configure status bar"));
 	m_label = new QLabel;
 	QHBoxLayout* layout = new QHBoxLayout;
 	layout->setContentsMargins(0, 0, 0, 0);
