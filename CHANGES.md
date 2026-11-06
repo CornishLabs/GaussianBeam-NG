@@ -9,6 +9,12 @@
   - Files: `gui/OpticsView.cpp` (`wavelengthColor`).
   - Removed "Better Wavelength to RGB function" from `TODO`.
 
+### Fixed
+
+- **Opening a file from the command line** (bugs present in GaussianBeam 0.4). This is also how a file opens when you double-click it or drop it on the `.exe`. Both bugs are fixed in `gui/GaussianBeamWindow.cpp` and `gui/GaussianBeamWindow.h`:
+  - **Empty view:** the file was opened before the window was shown. Its view range and origin were applied while the view was not yet at its final size, so the view showed the wrong part of the bench, often with no beam or optics in it. The file is now opened once the window is shown.
+  - **Wrong wavelength:** the last-used wavelength was applied after the file had been loaded, replacing the file's wavelength. The settings are now read first.
+
 ## GaussianBeam-NG 0.5.0
 
 New features: a relative waist position column, wavefronts on the graph, a dark mode and new icons. The `.xml` file format is unchanged, so files can be exchanged with GaussianBeam-NG 0.4.1 and GaussianBeam 0.4.

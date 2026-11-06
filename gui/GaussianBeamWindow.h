@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode toggle and new icons (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode toggle and new icons; fixed opening a file from the command line (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -60,6 +60,7 @@ protected slots:
 	void on_action_AddDielectricSlab_triggered()  { insertOptics(DielectricSlabType);  }
 	void on_WavelengthSpinBox_valueChanged(double wavelength);
 	void updateIcons();
+	void openStartupFile();
 
 protected:
 	virtual void closeEvent(QCloseEvent* event);
@@ -111,6 +112,7 @@ private:
 	QMap<OpticsType, QString> m_opticsElements;
 
 	QString m_currentFile;
+	QString m_startupFile; ///< file given on the command line, opened once the window is shown
 };
 
 #endif

@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode toggle and new icons (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; dark mode toggle and new icons; fixed opening a file from the command line (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,6 +27,7 @@
 #include <QSplitter>
 #include <QToolBar>
 #include <QToolButton>
+#include <QTimer>
 #include <QFile>
 #include <QFileDialog>
 #include <QMenu>
@@ -149,10 +150,23 @@ GaussianBeamWindow::GaussianBeamWindow(const QString& fileName)
 	m_bench.registerNotify(this);
 
 	setCurrentFile(QString()); // sets the window title to the program name and version
-	if (!fileName.isEmpty())
-		openFile(fileName);
-
+	// Read the settings first, so that the last-used wavelength does not
+	// replace the wavelength of a file opened from the command line
 	readSettings();
+
+	// Open a file given on the command line once the window is shown. The file's
+	// view range and origin depend on the size of the view, which is only final
+	// then. Opened here, the view showed the wrong part of the bench (often empty).
+	if (!fileName.isEmpty())
+	{
+		m_startupFile = fileName;
+		QTimer::singleShot(0, this, SLOT(openStartupFile()));
+	}
+}
+
+void GaussianBeamWindow::openStartupFile()
+{
+	openFile(m_startupFile);
 }
 
 void GaussianBeamWindow::closeEvent(QCloseEvent* event)
