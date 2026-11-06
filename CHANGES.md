@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- **Beam colours:** the colour of a beam now matches how its wavelength looks. It is based on the CIE 1931 colour matching functions (using the analytic fit of Wyman, Sloan and Shirley, 2013), converted to sRGB. Previously the colour came from a hand-tuned ramp. For example, 405 nm is now violet instead of blue, and 532 nm is green instead of yellow-green.
+  - Infrared and ultraviolet beams are drawn darker, so they look different from visible beams. The red darkens from 700 nm to half brightness at 1100 nm. The violet darkens from 410 nm to half brightness at 300 nm. For example, 780 nm and 1064 nm now look different from each other and from 633 nm.
+  - Files: `gui/OpticsView.cpp` (`wavelengthColor`).
+  - Removed "Better Wavelength to RGB function" from `TODO`.
+
 ## GaussianBeam-NG 0.5.0
 
 New features: a relative waist position column, wavefronts on the graph, a dark mode and new icons. The `.xml` file format is unchanged, so files can be exchanged with GaussianBeam-NG 0.4.1 and GaussianBeam 0.4.

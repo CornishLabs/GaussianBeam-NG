@@ -1,6 +1,6 @@
 /* This file is part of the GaussianBeam project
    Copyright (C) 2007-2008 Jérôme Lodewyck <jerome dot lodewyck at normalesup.org>
-   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; added wavefront drawing; dark mode and new icons (see CHANGES.md)
+   Modified 2026 by Daniel Ruttley: ported to Qt 5 and Windows; added wavefront drawing; dark mode and new icons; better beam colours (see CHANGES.md)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -34,30 +34,67 @@
 
 #include <cmath>
 
+namespace
+{
+	/// Piecewise Gaussian used by the CIE colour matching function fit
+	double cieLobe(double x, double mu, double sigmaLow, double sigmaHigh)
+	{
+		const double t = (x - mu)/(x < mu ? sigmaLow : sigmaHigh);
+		return exp(-0.5*t*t);
+	}
+
+	/// sRGB transfer curve: linear intensity in [0, 1] to display value
+	double srgbEncode(double v)
+	{
+		return (v <= 0.0031308) ? 12.92*v : 1.055*pow(v, 1./2.4) - 0.055;
+	}
+}
+
+/**
+* Colour of a beam of the given wavelength (in metres).
+*
+* The hue is how the eye sees the wavelength: the CIE 1931 colour matching
+* functions, using the analytic fit of Wyman, Sloan and Shirley, "Simple
+* Analytic Approximations to the CIE XYZ Color Matching Functions", Journal of
+* Computer Graphics Techniques 2(2), 2013. XYZ is converted to linear sRGB;
+* spectral colours are outside the sRGB gamut, so negative channels are clipped.
+* The colour is scaled to full brightness, then gamma encoded.
+*
+* The fit is only used between 410 and 660 nm: outside this range the true hue
+* hardly changes (violet below, red above) and the fit's tails are inaccurate.
+* Invisible beams fade to half brightness: from 700 nm to 1100 nm in the
+* infrared, and from 410 nm to 300 nm in the ultraviolet.
+*/
 QColor wavelengthColor(double wavelength)
 {
-	wavelength *= 1e9;
+	const double nm = wavelength*1e9;
+	const double l = qBound(410., nm, 660.);
 
-	if (wavelength < 380.)
-		return QColor::fromRgbF(0., 0., 1.);
-	if ((wavelength >= 380.) && (wavelength < 440.))
-		return QColor::fromRgbF(0., 0., 1.);
-	if ((wavelength >= 440.) && (wavelength < 490.))
-		return QColor::fromRgbF(0., (wavelength-440.)/50., 1.);
-	if ((wavelength >= 490.) && (wavelength < 510.))
-		return QColor::fromRgbF(0., 1. , (510.-wavelength)/40.);
-	if ((wavelength >= 510.) && (wavelength < 580.))
-		return QColor::fromRgbF((wavelength-510.)/70., 1., 0.);
-	if ((wavelength >= 580.) && (wavelength < 645.))
-		return QColor::fromRgbF(1., (645.-wavelength)/85., 0.);
-	if ((wavelength >= 645.) && (wavelength < 780.))
-		return QColor::fromRgbF(1., 0., 0.);
-	if ((wavelength >= 780.) && (wavelength < 800.))
-		return QColor::fromRgbF((900.-wavelength)/120., 0., 0.);
-	if (wavelength >= 800.)
-		return QColor::fromRgbF(.833, 0., 0.);
+	// CIE 1931 2° colour matching functions
+	const double X = 1.056*cieLobe(l, 599.8, 37.9, 31.0) + 0.362*cieLobe(l, 442.0, 16.0, 26.7)
+	               - 0.065*cieLobe(l, 501.1, 20.4, 26.2);
+	const double Y = 0.821*cieLobe(l, 568.8, 46.9, 40.5) + 0.286*cieLobe(l, 530.9, 16.3, 31.1);
+	const double Z = 1.217*cieLobe(l, 437.0, 11.8, 36.0) + 0.681*cieLobe(l, 459.0, 26.0, 13.8);
 
-	return Qt::black;
+	// Linear sRGB (D65), clipped to the displayable gamut
+	double r = qMax(0.,  3.2406*X - 1.5372*Y - 0.4986*Z);
+	double g = qMax(0., -0.9689*X + 1.8758*Y + 0.0415*Z);
+	double b = qMax(0.,  0.0557*X - 0.2040*Y + 1.0570*Z);
+
+	// Full brightness: only the hue comes from the wavelength
+	const double maximum = qMax(r, qMax(g, b));
+	r /= maximum;
+	g /= maximum;
+	b /= maximum;
+
+	// Fade invisible wavelengths to half brightness
+	double brightness = 1.;
+	if (nm > 700.)
+		brightness = 1. - 0.5*qMin(1., (nm - 700.)/400.);
+	else if (nm < 410.)
+		brightness = 1. - 0.5*qMin(1., (410. - nm)/110.);
+
+	return QColor::fromRgbF(brightness*srgbEncode(r), brightness*srgbEncode(g), brightness*srgbEncode(b));
 }
 
 /////////////////////////////////////////////////
