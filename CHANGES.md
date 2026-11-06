@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+
+- **Application icon:** the `.exe`, title bar and taskbar now show a GaussianBeam-NG icon. It shows a red (780 nm) laser beam focused by a lens to a waist, with its wavefronts, on a navy tile. The beam's shape and the wavefront curvature follow the Gaussian beam formulas. Sizes up to 48 px use a simplified drawing without wavefronts.
+  - Files: `gui/appicon/GaussianBeam-NG.svg` and `GaussianBeam-NG-small.svg` (the drawings), `gui/appicon/GaussianBeam-NG.ico` (built from them), `GaussianBeam.pro` (`RC_ICONS`).
+  - `tools/make-icon.ps1` rebuilds the `.ico` after the drawings change. It renders them with Microsoft Edge in headless mode, so no other tools are needed. The build itself uses the `.ico` in the repository and does not run the script.
+
 ### Changed
 
 - **Beam colours:** the colour of a beam now matches how its wavelength looks. It is based on the CIE 1931 colour matching functions (using the analytic fit of Wyman, Sloan and Shirley, 2013), converted to sRGB. Previously the colour came from a hand-tuned ramp. For example, 405 nm is now violet instead of blue, and 532 nm is green instead of yellow-green.
