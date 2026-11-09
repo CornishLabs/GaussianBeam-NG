@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## GaussianBeam-NG 0.6.0
+
+New features: an application icon and beam colours based on the CIE colour matching functions. Fixes opening a file from the command line (or by double-clicking it), which showed an empty view and the wrong wavelength. The `.xml` file format is unchanged, so files can be exchanged with earlier versions of GaussianBeam-NG and GaussianBeam 0.4.
 
 ### Added
 

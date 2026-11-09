@@ -34,7 +34,7 @@ The optional plotting feature (`CONFIG += plot` in `GaussianBeam.pro`) needs the
 
 ## Versioning
 
-GaussianBeam-NG uses [semantic versioning](https://semver.org). Version 0.4.1 is GaussianBeam 0.4 plus the fixes needed to build and run with Qt 5. It has the same features and file format as GaussianBeam 0.4. Version 0.5.0 adds new features (see [CHANGES.md](CHANGES.md)) and keeps the same file format.
+GaussianBeam-NG uses [semantic versioning](https://semver.org). Version 0.4.1 is GaussianBeam 0.4 plus the fixes needed to build and run with Qt 5. It has the same features and file format as GaussianBeam 0.4. Versions 0.5.0 and 0.6.0 add new features (see [CHANGES.md](CHANGES.md)) and keep the same file format.
 
 ## Licence
 
